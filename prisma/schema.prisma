@@ -11,18 +11,19 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  firstName String?
-  lastName  String?
-  sessions  Session[]
-  orders    Order[]
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  phoneNumber String
+  firstName   String?
+  lastName    String?
+  sessions    Session[]
+  orders      Order[]
 }
 
 model Session {
-  id     String  @id @default(uuid())
-  user   User?   @relation(fields: [userId], references: [id])
+  key    String  @id @default(uuid()) @map("id")
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
   orders Order[]
 }
@@ -34,15 +35,15 @@ enum OrderStatus {
 }
 
 model Order {
-  id           String      @id @default(uuid())
-  email        String?
-  phone_number String?
-  session      Session     @relation(fields: [sessionId], references: [id])
-  sessionId    String
-  user         User?       @relation(fields: [userId], references: [id])
-  userId       String?
-  status       OrderStatus @default(DRAFT)
-  orderLines   OrderLine[]
+  id          String      @id @default(uuid())
+  email       String?
+  phoneNumber String?
+  session     Session?    @relation(fields: [sessionId], references: [key])
+  sessionId   String
+  user        User?       @relation(fields: [userId], references: [id])
+  userId      String?
+  status      OrderStatus @default(DRAFT)
+  orderLines  OrderLine[]
 }
 
 model Product {
@@ -53,12 +54,11 @@ model Product {
 }
 
 model OrderLine {
-  id         String  @id @default(uuid())
-  order      Order   @relation(fields: [orderId], references: [id])
-  orderId    String
-  porduct    Product @relation(fields: [productId], references: [id])
-  productId  String
-  quantity   Float
-  unitPrice  Float
-  totalPrice Float?
+  id        String  @id @default(uuid())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  porduct   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Float
+  unitPrice Float
 }
